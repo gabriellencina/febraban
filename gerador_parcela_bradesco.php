@@ -26,15 +26,19 @@ $convenio = $_GET['convenio'];
 
 if (isset($_GET['convenio'])) {
     // Busca os dados do convenio
-    $sql = "SELECT * , bancos.nome_banco, bancos.codigo_febraban, convenios_debito_em_conta.banco_id
-                FROM convenios_debito_em_conta 
-                INNER JOIN bancos
-                ON bancos.id = convenios_debito_em_conta.banco_id	
-                WHERE `cod_convenio` = " . $convenio;
+    $sql = "SELECT * , convenios_debito_em_conta.id, bancos.nome_banco, bancos.codigo_febraban, convenios_debito_em_conta.banco_id
+            FROM convenios_debito_em_conta 
+            INNER JOIN bancos
+            ON bancos.id = convenios_debito_em_conta.banco_id	
+            WHERE `cod_convenio` = " . $convenio;
     $res = $connection->query($sql);
 
-    $row       = $res->fetch_object();
+    $row = $res->fetch_object();
+
+    $id_convenio = $row->id;
+
     $cod_banco = $row->codigo_febraban;
+    
     $convenio  = $row->cod_convenio;
 
     if ($cod_banco == 237) {
@@ -60,7 +64,6 @@ if (isset($_GET['convenio'])) {
                         INNER JOIN bancos AS B ON D.banco_id = B.id
                         WHERE N.dia_debito = $dia AND N.status_negocio = 1 AND C.cod_convenio = $convenio $condicao";
             $res2     = $connection->query($sql);
-
             $rowcount = mysqli_num_rows($res2);
 
             $i = 0;
@@ -96,9 +99,9 @@ if (isset($_GET['convenio'])) {
                         $hora_parcelas = date('Y-m-d H:i:s');
                         
                         // Geramos nossa parcela e inserimos os dados no banco
-                        $sql  = "INSERT INTO negocio_parcelas (negocio_id, vencimento, valor, total, numero_parcela, vencimento_original, agencia, banco, conta_corrente, cod_operacao, status, data_criacao)
+                        $sql  = "INSERT INTO negocio_parcelas (negocio_id, vencimento, valor, total, numero_parcela, vencimento_original, agencia, banco, conta_corrente, cod_operacao, status, data_criacao, convenio_id)
                                  VALUES ($row2->negocio, '$data', $row2->valor_total, $row2->valor_total, $numero_parcelas, '$data_original', 
-                                '$row2->agencia_bancaria', '$row2->banco', '$row2->conta_corrente', '$row2->cod_operacao', 1, '$hora_parcelas')";
+                                '$row2->agencia_bancaria', '$row2->banco', '$row2->conta_corrente', '$row2->cod_operacao', 1, '$hora_parcelas', $id_convenio)";
                         $res4 = $connection->query($sql);
                     }    
                 }

@@ -6,7 +6,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-
 include("vendor/autoload.php");
 include('connection.php');
 
@@ -127,7 +126,21 @@ if (isset($_GET['convenio'])) {
 																 $condicao";
 
 			$res3 = $connection->query($sql);
-			 
+
+			$nome_arquivo_debito_conta = "CB" . date('dm') . str_pad($numero_sequencial_arquivo, 2, '0', STR_PAD_LEFT) . ".REM";
+			
+			$data_geracao_atual = date('Y-m-d');
+			
+			// Insere os dados do arquivo na tabela arquivos debito conta
+			$sql = "INSERT INTO arquivos_debito_conta (nome_arquivo, tipo_arquivo, data_criacao, convenio, numero_registros, arquivo_optante, numero_arquivo)
+					VALUES('$nome_arquivo_debito_conta', 'REM', '$data_geracao_atual', $convenio, $contador_registros, 0, $numero_sequencial_arquivo)";
+			$res4 = $connection->query($sql);
+			
+			// Busca os dados do arquivos debito conta
+			$sql = "SELECT id FROM arquivos_debito_conta WHERE nome_arquivo = '$nome_arquivo_debito_conta' AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
+			$res5 = $connection->query($sql);
+			$row5 = $res5->fetch_object();
+
 			while($row2 = $res3->fetch_object())
 			{
 				$converte_cep   = intval($row2->cep);
@@ -143,7 +156,7 @@ if (isset($_GET['convenio'])) {
 				}
 
 				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`num_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
-				$res4 = $connection->query($sql);
+				$res6 = $connection->query($sql);
 
 				// Soma e Formata o valor da parcela
 				$soma_valores = $soma_valores + $row2->total;
@@ -233,12 +246,22 @@ if (isset($_GET['convenio'])) {
 				$contador_registros += 1;
 
 				$content .= bradescoDebAuto400LayoutCNAB::Registro6($Registro6) . PHP_EOL;
+										
+				$sql = "INSERT INTO arquivos_debito_conta_retornos (data_ocorrencia, arquivo_debito_conta_id, negocio_parcela_id, registro, agencia, conta, cliente_id, status)
+						VALUES('$data_geracao_atual', $row5->id, $row2->negocio_id, $contador_registros, $row2->agencia_bancaria, $row2->conta_corrente, $row2->id, $row2->status)";
+				$res7 = $connection->query($sql);
 			}
 
+			// atualiza meu numero de registros na tabela arquivos debito conta
+			$sql = "UPDATE arquivos_debito_conta 
+					SET numero_registros = '$contador_registros' 
+					WHERE nome_arquivo = '$nome_arquivo_debito_conta' AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
+			$res8 = $connection->query($sql);
+			
 			// REGISTRO 9
 			$Registro9 = array();
-			$Registro9["cod_registro9"]            = 9;
-			$Registro9["reservado_futuro_9"]       = " ";
+			$Registro9["cod_registro9"]                = 9;
+			$Registro9["reservado_futuro_9"]           = " ";
 			$Registro9["numero_sequencial_registro3"]  = $contador_registros;
 
 			$content .= bradescoDebAuto400LayoutCNAB::Registro9($Registro9) . PHP_EOL;

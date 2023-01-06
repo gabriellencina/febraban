@@ -15,10 +15,25 @@ if(isset($_POST['convenio']))
     $convenio = $_POST['convenio'];
 }
 
+if(isset($_POST['vendedor']))
+{
+    $vendedor = $_POST['vendedor'];
+}
+
+if(isset($_POST['dia_inicial']))
+{
+    $dia_inicial = $_POST['dia_inicial'];
+}
+
+if(isset($_POST['dia_final']))
+{
+    $dia_final = $_POST['dia_final'];
+}
+
 if(isset($_POST['gera_parcela']))
 {
     $gera_parcela = $_POST['gera_parcela'];
-    $url = 'gerador_parcela_bb.php?data=' . $data . '&convenio=' . $convenio . '&' . 'optante=0';
+    $url = 'gerador_parcela_bb.php?data=' . $data . '&convenio=' . $convenio . '&' . 'optante=0'. '&vendedor=' . $vendedor . '&dia_inicial=' . $dia_inicial . '&dia_final=' . $dia_final;
     header("Location: $url");
 }
 

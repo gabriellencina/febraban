@@ -16,7 +16,8 @@ $vencimento = date('Y-m-d', strtotime($_GET['data']));
 
 $vendedor 	= $_GET['vendedor'];
 
-if (isset($_GET['convenio'])) {
+if(isset($_GET['convenio'])) 
+{
 	// Busca os dados do convenio
 	$sql = "SELECT * , bancos.nome_banco, bancos.codigo_febraban, convenios_debito_em_conta.banco_id
             FROM convenios_debito_em_conta 
@@ -65,7 +66,7 @@ if (isset($_GET['convenio'])) {
 
 			$content  = '';
 
-			$content .= bradescoDebAuto400LayoutCNAB::Registro0($Registro0) . PHP_EOL;
+			$content .= bradescoDebAuto400LayoutCNAB::Registro0($Registro0).PHP_EOL;
 
 			$condicao = !empty($vendedor) ? "AND N.vendedor_id = $vendedor" :  " ";
 
@@ -130,13 +131,13 @@ if (isset($_GET['convenio'])) {
 			$nome_arquivo_debito_conta = "CB" . date('dm') . str_pad($numero_sequencial_arquivo, 2, '0', STR_PAD_LEFT) . ".REM";
 			
 			$data_geracao_atual = date('Y-m-d');
-			
-			// Insere os dados do arquivo na tabela arquivos debito conta
+		
+			// Insere os dados do nosso arquivo na tabela arquivos debito conta
 			$sql = "INSERT INTO arquivos_debito_conta (nome_arquivo, tipo_arquivo, data_criacao, convenio, numero_registros, arquivo_optante, numero_arquivo)
 					VALUES('$nome_arquivo_debito_conta', 'REM', '$data_geracao_atual', $convenio, $contador_registros, 0, $numero_sequencial_arquivo)";
 			$res4 = $connection->query($sql);
 			
-			// Busca os dados do arquivos debito conta
+			// Busca o id com base no nome do aquivo, data criação e convenio 
 			$sql = "SELECT id FROM arquivos_debito_conta WHERE nome_arquivo = '$nome_arquivo_debito_conta' AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
 			$res5 = $connection->query($sql);
 			$row5 = $res5->fetch_object();
@@ -150,9 +151,13 @@ if (isset($_GET['convenio'])) {
 
 				// Verifica se a data de vencimento é menor que a data passada no parâmetro, se sim, atualiza o vencimento para o parametro passado
 				if ($reg_vencimento < $reg_venci) {
+
 					$data_vencimento = str_replace('-', '', $vencimento);
+
 				} else {
+
 					$data_vencimento = str_replace('-', '', $row2->vencimento);
+					
 				}
 
 				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`num_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;

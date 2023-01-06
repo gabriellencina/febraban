@@ -13,6 +13,8 @@
 
 	$vencimento = date('Y-m-d',strtotime($_GET['data']));
 
+    $vendedor 	= $_GET['vendedor'];
+
 	$optante    = $_GET['optante'];
 
     if(isset($_GET['convenio']))
@@ -22,11 +24,10 @@
                 FROM convenios_debito_em_conta 
                 INNER JOIN bancos
                 ON bancos.id = convenios_debito_em_conta.banco_id	
-                WHERE `cod_convenio` = ".$convenio;
+                WHERE `cod_convenio` = " . $convenio;
         $res = $connection->query($sql);
         $row = $res->fetch_object();
 
-        
         //Inicializa as variáveis
 		$cod_banco = $row->codigo_febraban;
 		$convenio  = $row->cod_convenio;	
@@ -57,6 +58,8 @@
                 $content  = '';
                 
                 $content .= bbDebAuto150Layout::RegistroA($RegistroA).PHP_EOL;
+
+                $condicao = !empty($vendedor) ? "AND N.vendedor_id = $vendedor" :  " ";
 
                 //REGISTRO E
                 // Busca as parcelas
@@ -100,7 +103,8 @@
                         D.agencia_bancaria,
                         D.conta_corrente,
                         V.mensagem_cliente,
-                        V.codigo_carteira
+                        V.codigo_carteira,
+                        N.vendedor_id
                         FROM negocio_parcelas
                         INNER JOIN negocios as N ON N.id = negocio_id
                         INNER JOIN clientes as C ON N.cliente_id = C.id
@@ -109,83 +113,110 @@
                         LEFT JOIN ufs as U ON U.id = T.uf_cidade
                         INNER JOIN forma_pagamento as F ON N.forma_pagamento = F.id
                         INNER JOIN convenios_debito_em_conta as V ON F.cod_convenio = V.id
-                        WHERE negocio_parcelas.numero_registro_e = 0 AND negocio_parcelas.vencimento <= '$vencimento' AND V.cod_convenio = $convenio AND negocio_parcelas.status = 1";
-			 $res3 = $connection->query($sql);
-           
-			$soma_valores = 0;
-            
-            while ($row2 = $res3->fetch_object())
-            {
-               if($optante == 0)
-               {
-                   // Verifica se a data de vencimento é menor que a data passada no parâmetro, se sim, atualiza o vencimento para o parametro passado
-                   if (str_replace('-', '', $row2->vencimento) < str_replace('-', '', $vencimento))
-                   {
-                       $data_vencimento = str_replace('-', '', $vencimento);
-                   } else {
-                       $data_vencimento = str_replace('-', '', $row2->vencimento);
-                   }
-       
-				    $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`num_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
-				    $res4 = $connection->query($sql);
+                        WHERE negocio_parcelas.numero_registro_e = 0 AND negocio_parcelas.vencimento <= '$vencimento' 
+                                                                     AND V.cod_convenio = $convenio 
+                                                                     AND negocio_parcelas.status = 1
+                                                                     $condicao";
+			    $res3 = $connection->query($sql);
                 
-                   // Soma e Formata o valor da parcela
-                    $soma_valores = $soma_valores + $row2->total;
-				    $inteiro      = intval($row2->total);
-				    $centavos     = substr(number_format($row2->total, 2, ',', '.'), strpos(number_format($row2->total, 2, ',', '.'), ',', 0) + 1, strlen(number_format($row2->total, 2, ',', '.')));
+                $nome_arquivo_debito_conta = "DEB_".$cod_banco."_".$convenio."_".date('ymd')."_".str_pad($numero_sequencial_arquivo, 5 , '0' , STR_PAD_LEFT).".REM";
+                
+                $data_geracao_atual = date('Y-m-d');
+            
+			    $soma_valores = 0;
 
-				    $formata_vencimento = date('dmy', strtotime($row2->vencimento));
-                   
-               } else {
-				   $data_vencimento = '99999999';
-                   $soma_valores    = 0;
-                   $inteiro         = 0;
-                   $centavos        = '00';
-               }
-
-                $limpa_campo_conta_corrente =   [
-                                                    'A', 'a', 'B', 'b', 'C', 'c',
-                                                    'D', 'd', 'E', 'e', 'F', 'f',
-                                                    'G', 'g', 'H', 'h', 'I', 'i',
-                                                    'J', 'j', 'K', 'k', 'L', 'l',
-                                                    'M', 'm', 'N', 'n', 'O', 'o',
-                                                    'P', 'p', 'Q', 'q', 'R', 'r',
-                                                    'S', 's', 'T', 't', 'U', 'u',
-                                                    'V', 'v', 'W', 'w', 'X', 'x',
-                                                    'Y', 'y', 'Z', 'z'
-				                                ];
-
-                // Preenche array do Registro E
-                $RegistroE = array();
-                $RegistroE["cod_registro_e"]                = "E";
-                $RegistroE["id_cliente_destinataria"]       = $row2->cpf;
-                $RegistroE["agencia_debito"]                = $row2->agencia_bancaria;
-                $RegistroE["id_cliente_depositaria"]        = intval(str_replace($limpa_campo_conta_corrente, 0, $row2->conta_corrente));
-                $RegistroE["prazo_validade_contrato"]       = $data_vencimento;
-                $RegistroE["valor_debito"]                  = intval($inteiro.$centavos);
-                $RegistroE["cod_moeda"]                     = 03;
-                $RegistroE["uso_instituicao_destinataria"]  = $row2->parcela;
-                $RegistroE["uso_instituicao_destinataria2"] = "X"; 
-                $RegistroE["tipo_identificacao"]            = 2;
-                $RegistroE["identificacao"]                 = $row2->cpf;
-                $RegistroE["tipo_operacao"]                 = 3;
-                $RegistroE["utilizacao_cheque_especial"]    = 2;
-                $RegistroE["opcao_debito_parcial"]          = 2;
-                $RegistroE["reservado_futuro_E"]            = " ";
-
-                if($optante == 0) 
+                // Insere os dados do nosso arquivo na tabela arquivos debito conta
+			    $sql = "INSERT INTO arquivos_debito_conta (nome_arquivo, tipo_arquivo, data_criacao, convenio, numero_registros, arquivo_optante, numero_arquivo)
+                        VALUES('$nome_arquivo_debito_conta', 'REM', '$data_geracao_atual', $convenio, $contador_registros, 0, $numero_sequencial_arquivo)";
+                $res5 = $connection->query($sql);
+    
+                // Busca o id com base no nome do aquivo, data criação e convenio 
+                $sql = "SELECT id FROM arquivos_debito_conta WHERE nome_arquivo = '$nome_arquivo_debito_conta' AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
+                $res6 = $connection->query($sql);
+                $row5 = $res6->fetch_object();
+            
+                while ($row2 = $res3->fetch_object())
                 {
-                    $RegistroE["cod_movimento"]        =  0;
-                } else {
-                    $RegistroE["cod_movimento"]        =  5;
+                    if($optante == 0)
+                    {
+                        // Verifica se a data de vencimento é menor que a data passada no parâmetro, se sim, atualiza o vencimento para o parametro passado
+                        if (str_replace('-', '', $row2->vencimento) < str_replace('-', '', $vencimento))
+                        {
+                            $data_vencimento = str_replace('-', '', $vencimento);
+                        } else {
+                            $data_vencimento = str_replace('-', '', $row2->vencimento);
+                        }
+            
+                            $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`num_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
+                            $res7 = $connection->query($sql);
+                        
+                            // Soma e Formata o valor da parcela
+                            $soma_valores = $soma_valores + $row2->total;
+                            $inteiro      = intval($row2->total);
+                            $centavos     = substr(number_format($row2->total, 2, ',', '.'), strpos(number_format($row2->total, 2, ',', '.'), ',', 0) + 1, strlen(number_format($row2->total, 2, ',', '.')));
+
+                            $formata_vencimento = date('dmy', strtotime($row2->vencimento));
+                        
+                        } else {
+                            $data_vencimento = '99999999';
+                            $soma_valores    = 0;
+                            $inteiro         = 0;
+                            $centavos        = '00';
+                        }
+
+                    $limpa_campo_conta_corrente =   [
+                                                        'A', 'a', 'B', 'b', 'C', 'c',
+                                                        'D', 'd', 'E', 'e', 'F', 'f',
+                                                        'G', 'g', 'H', 'h', 'I', 'i',
+                                                        'J', 'j', 'K', 'k', 'L', 'l',
+                                                        'M', 'm', 'N', 'n', 'O', 'o',
+                                                        'P', 'p', 'Q', 'q', 'R', 'r',
+                                                        'S', 's', 'T', 't', 'U', 'u',
+                                                        'V', 'v', 'W', 'w', 'X', 'x',
+                                                        'Y', 'y', 'Z', 'z'
+                                                    ];
+
+                    // Preenche array do Registro E
+                    $RegistroE = array();
+                    $RegistroE["cod_registro_e"]                = "E";
+                    $RegistroE["id_cliente_destinataria"]       = $row2->cpf;
+                    $RegistroE["agencia_debito"]                = $row2->agencia_bancaria;
+                    $RegistroE["id_cliente_depositaria"]        = intval(str_replace($limpa_campo_conta_corrente, 0, $row2->conta_corrente));
+                    $RegistroE["prazo_validade_contrato"]       = $data_vencimento;
+                    $RegistroE["valor_debito"]                  = intval($inteiro.$centavos);
+                    $RegistroE["cod_moeda"]                     = 03;
+                    $RegistroE["uso_instituicao_destinataria"]  = $row2->parcela;
+                    $RegistroE["uso_instituicao_destinataria2"] = "X"; 
+                    $RegistroE["tipo_identificacao"]            = 2;
+                    $RegistroE["identificacao"]                 = $row2->cpf;
+                    $RegistroE["tipo_operacao"]                 = 3;
+                    $RegistroE["utilizacao_cheque_especial"]    = 2;
+                    $RegistroE["opcao_debito_parcial"]          = 2;
+                    $RegistroE["reservado_futuro_E"]            = " ";
+
+                    if($optante == 0) 
+                    {
+                        $RegistroE["cod_movimento"]        =  0;
+                    } else {
+                        $RegistroE["cod_movimento"]        =  5;
+                    }
+                
+                    $contador_registros += +1;
+
+                    $content .= bbDebAuto150Layout::RegistroE($RegistroE).PHP_EOL;
+
+                    $sql = "INSERT INTO arquivos_debito_conta_retornos (data_ocorrencia, arquivo_debito_conta_id, negocio_parcela_id, registro, agencia, conta, cliente_id, status)
+                            VALUES('$data_geracao_atual', $row5->id, $row2->negocio_id, $contador_registros, $row2->agencia_bancaria, $row2->conta_corrente, $row2->id, $row2->status)";
+                    $res8 = $connection->query($sql);
                 }
-              
-                $contador_registros += +1;
 
-                $content .= bbDebAuto150Layout::RegistroE($RegistroE).PHP_EOL;
-            }
+                // atualiza meu numero de registros na tabela arquivos debito conta
+			    $sql = "UPDATE arquivos_debito_conta 
+                        SET numero_registros = '$contador_registros' 
+                        WHERE nome_arquivo = '$nome_arquivo_debito_conta' AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
+                $res8 = $connection->query($sql);
 
-            // Registro Z, confere a somatoria dos Registros E
+                // Registro Z, confere a somatoria dos Registros E
                 $RegistroZ = array();
                 $inteiro 										= intval($soma_valores);
                 $centavos 										= substr(number_format($soma_valores, 2, ',', '.'), strpos(number_format($soma_valores, 2, ',', '.'),',',0)+1, strlen(number_format($soma_valores, 2, ',', '.')));

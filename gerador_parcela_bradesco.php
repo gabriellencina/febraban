@@ -19,11 +19,12 @@
 
     $arruma_data = explode('-', $data);
 
+    
     $dia         = $dia_final;
     $mes         = $arruma_data[1];
     $ano         = $arruma_data[0];
-
-
+    
+    
     if(isset($_GET['convenio'])) 
     {
         // Busca os dados do convenio
@@ -33,22 +34,22 @@
                 ON bancos.id = convenios_debito_em_conta.banco_id	
                 WHERE `cod_convenio` = " . $convenio;
         $res = $connection->query($sql);
-
+        
         $row = $res->fetch_object();
-
+        
         $id_convenio = $row->id;
-
+        
         $cod_banco = $row->codigo_febraban;
         
         $convenio  = $row->cod_convenio;
-
+        
         if($cod_banco == 237) 
         {
             // Gera parcelas
             while($dia >= $dia_inicial) 
             {
                 $condicao = !empty($vendedor) ? "AND N.vendedor_id = $vendedor" :  " ";
-
+                
                 // Consulta negócio pelo dia da data informada, status e convênio
                 $sql = "SELECT N.id AS negocio, 
                         N.dia_debito AS dia_debito,
@@ -67,11 +68,11 @@
                         INNER JOIN bancos AS B ON D.banco_id = B.id
                         WHERE N.dia_debito = $dia AND N.status_negocio = 1 AND C.cod_convenio = $convenio $condicao";
                 $res2 = $connection->query($sql);
-
+                
                 $rowcount = mysqli_num_rows($res2);
-
+                
                 $i = 0;
-
+                
                 while($row2 = $res2->fetch_object())
                 {
                     $dia_data_original = $row2->dia_debito;
@@ -85,7 +86,7 @@
                         $sql  = "SELECT id FROM negocio_parcelas WHERE negocio_id = $row2->negocio AND vencimento_original = '$data_original'";
                         $res3 = $connection->query($sql);
                         $result = $res3->fetch_object();
-                
+                        
                         // Verifica se meu negocio possui parcela, se não encontrar, insere
                         if(empty($result))
                         {

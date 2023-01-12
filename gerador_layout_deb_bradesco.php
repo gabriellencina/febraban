@@ -11,9 +11,7 @@ include('connection.php');
 
 // Recebendo por parâmetro de url o cod do convenio e data de vencimento
 $convenio   = $_GET['convenio'];
-
 $vencimento = date('Y-m-d', strtotime($_GET['data']));
-
 $vendedor 	= $_GET['vendedor'];
 
 if(isset($_GET['convenio'])) 
@@ -28,6 +26,7 @@ if(isset($_GET['convenio']))
 	$row = $res->fetch_object();
 
 	// Inicializa variáveis
+	$Registro0 					= array();
 	$Registro1                  = array();
 	$Registro6                  = array();
 	$soma_valores               = 0;
@@ -41,13 +40,12 @@ if(isset($_GET['convenio']))
 
 	switch ($cod_banco) {
 		case 237:
-
-			// Adiciona 1 ao numero sequencial do arquivo e guarda no convenio
+			
+			// Adiciona 1 ao numero sequencial do arquivo e guarda convenios_debito_em_conta
 			$sql = "UPDATE `convenios_debito_em_conta` SET `numero_sequencial_arquivo` = $numero_sequencial_arquivo  WHERE `cod_convenio` = " . $convenio;
 			$res2 = $connection->query($sql);
 
 			// REGISTRO 0
-			$Registro0 = array();
 			$Registro0["cod_registro0"]                                 = 0;
 			$Registro0["cod_remessa"]                                   = 1;
 			$Registro0["literal_remessa"]                               = "REMESSA";
@@ -63,12 +61,15 @@ if(isset($_GET['convenio']))
 			$Registro0["numero_sequencial_arquivo"]                     = $numero_sequencial_arquivo;
 			$Registro0["reservado_futuro2"]                             = " ";
 			$Registro0["numero_sequencial_registro"]                    = $row->numero_registro_a;
-
-			$content  = '';
+			
+			
+			$content  = '';	
 
 			$content .= bradescoDebAuto400LayoutCNAB::Registro0($Registro0).PHP_EOL;
 
 			$condicao = !empty($vendedor) ? "AND N.vendedor_id = $vendedor" :  " ";
+			var_dump($condicao);
+			exit();
 
 			// Busca as parcelas
 			$sql = "SELECT negocio_parcelas.id as parcela,
@@ -127,7 +128,7 @@ if(isset($_GET['convenio']))
 																 $condicao";
 
 			$res3 = $connection->query($sql);
-
+			
 			$nome_arquivo_debito_conta = "CB" . date('dm') . str_pad($numero_sequencial_arquivo, 2, '0', STR_PAD_LEFT) . ".REM";
 			
 			$data_geracao_atual = date('Y-m-d');
@@ -181,8 +182,7 @@ if(isset($_GET['convenio']))
 													'V', 'v', 'W', 'w', 'X', 'x',
 													'Y', 'y', 'Z', 'z'
 												];
-
-				// Preenche Array do REGISTRO 1"                    
+                 
 				$Registro1["cod_registro1"]                         = 1;
 				$Registro1["agencia_debito"]                        = intval(str_replace(" ", "", $row2->agencia_bancaria));
 				$Registro1["razao_conta_corrente"]                  = 0;
@@ -233,7 +233,6 @@ if(isset($_GET['convenio']))
 
 				$content .= bradescoDebAuto400LayoutCNAB::Registro1($Registro1) . PHP_EOL;
 
-				// Preenche Array do REGISTRO 6"
 				$Registro6["cod_registro6"]                         = 6;
 				$Registro6["carteira"]                              = $row->codigo_carteira;
 				$Registro6["agencia_debito"]                        = $agencia;
@@ -263,7 +262,6 @@ if(isset($_GET['convenio']))
 					WHERE nome_arquivo = '$nome_arquivo_debito_conta' AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
 			$res8 = $connection->query($sql);
 			
-			// REGISTRO 9
 			$Registro9 = array();
 			$Registro9["cod_registro9"]                = 9;
 			$Registro9["reservado_futuro_9"]           = " ";
@@ -271,7 +269,7 @@ if(isset($_GET['convenio']))
 
 			$content .= bradescoDebAuto400LayoutCNAB::Registro9($Registro9) . PHP_EOL;
 
-			//Cria o arquivo
+			// Gera arquivo de débito automático com os dados e logo após salva  
 			$nome_arquivo = "CB" . date('dm') . str_pad($numero_sequencial_arquivo, 2, '0', STR_PAD_LEFT) . ".REM";
 			$fp = fopen($_SERVER['DOCUMENT_ROOT'] . "/$nome_arquivo", "wb");
 			fwrite($fp, $content);

@@ -1,8 +1,8 @@
 <?php
 define ('HOST','mysql.intranetfuturo.com.br');
-define ('USER','intranetfuturo01');
+define ('USER','intranetfuturo04');
 define ('PASS','Futuro2022');
-define ('BASE','intranetfuturo01');  
+define ('BASE','intranetfuturo04');  
 
 // define ('HOST','localhost');
 // define ('USER','root');

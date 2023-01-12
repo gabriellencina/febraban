@@ -87,7 +87,7 @@
                         $result = $res3->fetch_object();
                     
                         // Verifica se meu negocio possui parcela, se não encontrar, insere
-                        if(empty($result))
+                        if(isset($result))
                         {
                             $i++;
                             // Conta meu número de parcelas pelo meu negocio                    

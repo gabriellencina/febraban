@@ -69,8 +69,6 @@
                             $numero_parcelas = $row3->contador;
                                                 
                             // Geramos nossa parcela e inserimos os dados no banco
-
-                     
                             $sql  = "INSERT INTO negocio_parcelas (negocio_id, vencimento, valor, total, pagamento_parcelas, numero_parcela, vencimento_original, status)
                                      VALUES ($row->negocio, $data, $row->valor_total, $row->valor_total, 0, $numero_parcelas, $data_original, 1)";
                             $res4 = $connection->query($sql);

@@ -118,6 +118,7 @@
                                                                      AND negocio_parcelas.status = 1
                                                                      $condicao";
 			    $res3 = $connection->query($sql);
+               
                 
                 $nome_arquivo_debito_conta = "DEB_".$cod_banco."_".$convenio."_".date('ymd')."_".str_pad($numero_sequencial_arquivo, 5 , '0' , STR_PAD_LEFT).".REM";
                 
@@ -135,6 +136,7 @@
                 $res6 = $connection->query($sql);
                 $row5 = $res6->fetch_object();
             
+         
                 while ($row2 = $res3->fetch_object())
                 {
                     if($optante == 0)

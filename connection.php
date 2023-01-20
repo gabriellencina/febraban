@@ -10,3 +10,5 @@ define ('BASE','intranetfuturo04');
 // define ('BASE','intranet');  
 
 $connection = new mysqli(HOST, USER, PASS, BASE); 
+
+

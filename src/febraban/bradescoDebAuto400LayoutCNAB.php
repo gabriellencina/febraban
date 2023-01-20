@@ -1,7 +1,6 @@
 <?php
 
 namespace febraban;
-
 class bradescoDebAuto400LayoutCNAB
 {
 

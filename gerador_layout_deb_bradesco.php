@@ -62,70 +62,112 @@ if(isset($_GET['convenio']))
 			$Registro0["reservado_futuro2"]                             = " ";
 			$Registro0["numero_sequencial_registro"]                    = $row->numero_registro_a;
 			
-			
 			$content  = '';	
 
 			$content .= bradescoDebAuto400LayoutCNAB::Registro0($Registro0).PHP_EOL;
 
 			$condicao = !empty($vendedor) ? "AND N.vendedor_id = $vendedor" :  " ";
-			var_dump($condicao);
-			exit();
 
 			// Busca as parcelas
-			$sql = "SELECT negocio_parcelas.id as parcela,
-					negocio_parcelas.negocio_id,
-					negocio_parcelas.documento, 
-					negocio_parcelas.vencimento,   
-					negocio_parcelas.valor,   
-					negocio_parcelas.data_pagamento,  
-					negocio_parcelas.multa,  
-					negocio_parcelas.juros,
-					negocio_parcelas.total, 
-					negocio_parcelas.pagamento_parcelas,
-					negocio_parcelas.cod_retorno,  
-					negocio_parcelas.cod_retorno1,  
-					negocio_parcelas.cod_retorno2,  
-					negocio_parcelas.cod_retorno3,
-					negocio_parcelas.cod_retorno4,
-					negocio_parcelas.cod_retorno5,  
-					negocio_parcelas.numero_parcela,   
-					negocio_parcelas.num_sequencial_arquivo_debito,
-					negocio_parcelas.numero_registro_e,  
-					negocio_parcelas.numero_agendamento_cliente,
-					negocio_parcelas.vencimento_original,
-					negocio_parcelas.valor_tarifa,
-					negocio_parcelas.status,
-					C.id,
-					C.endereco,
-					C.numero_endereco,
-					C.complemento_endereco,
-					C.bairro,
-					C.nome,
-					C.sobrenome,
-					C.cpf,
-					C.cep,
-					C.cidade,  
-					T.nome_cidade,
-					U.nome_uf,
-					V.cod_convenio,
-					F.dias_antecedencia_cobranca_debito,
-					D.agencia_bancaria,
-					D.conta_corrente,
-					V.mensagem_cliente,
-					V.codigo_carteira,
-					N.vendedor_id
-					FROM negocio_parcelas
-					INNER JOIN negocios as N ON N.id = negocio_id
-					INNER JOIN clientes as C ON N.cliente_id = C.id
-					INNER JOIN clientes_dados_debito as D ON N.conta_debito = D.id
-					LEFT JOIN cidades as T ON T.id = C.cidade
-					LEFT JOIN ufs as U ON U.id = T.uf_cidade
-					INNER JOIN forma_pagamento as F ON N.forma_pagamento = F.id
-					INNER JOIN convenios_debito_em_conta as V ON F.cod_convenio = V.id
-					WHERE negocio_parcelas.numero_registro_e = 0 AND negocio_parcelas.vencimento <= '$vencimento' 
-																 AND V.cod_convenio = $convenio 
-																 AND negocio_parcelas.status = 1 
-																 $condicao";
+			$sql = "SELECT 
+						MAX(negocio_parcelas.id) AS parcela,
+						negocio_parcelas.negocio_id,
+						negocio_parcelas.documento,
+						negocio_parcelas.vencimento,
+						negocio_parcelas.valor,
+						negocio_parcelas.data_pagamento,
+						negocio_parcelas.multa,
+						negocio_parcelas.juros,
+						negocio_parcelas.total,
+						negocio_parcelas.pagamento_parcelas,
+						negocio_parcelas.cod_retorno,
+						negocio_parcelas.cod_retorno1,
+						negocio_parcelas.cod_retorno2,
+						negocio_parcelas.cod_retorno3,
+						negocio_parcelas.cod_retorno4,
+						negocio_parcelas.cod_retorno5,
+						MAX(negocio_parcelas.numero_parcela),
+						negocio_parcelas.num_sequencial_arquivo_debito,
+						negocio_parcelas.numero_registro_e,
+						negocio_parcelas.numero_agendamento_cliente,
+						negocio_parcelas.vencimento_original,
+						negocio_parcelas.valor_tarifa,
+						negocio_parcelas.status,
+						C.id,
+						C.endereco,
+						C.numero_endereco,
+						C.complemento_endereco,
+						C.bairro,
+						C.nome,
+						C.sobrenome,
+						C.cpf,
+						C.cep,
+						C.cidade,
+						T.nome_cidade,
+						U.nome_uf,
+						V.cod_convenio,
+						F.dias_antecedencia_cobranca_debito,
+						D.agencia_bancaria,
+						D.conta_corrente,
+						V.mensagem_cliente,
+						V.codigo_carteira,
+						N.vendedor_id
+					FROM   
+						negocio_parcelas INNER JOIN 
+						negocios AS N ON N.id = negocio_id INNER JOIN 
+						clientes AS C ON N.cliente_id = C.id INNER JOIN 
+						clientes_dados_debito AS D ON N.conta_debito = D.id LEFT JOIN
+						cidades AS T ON T.id = C.cidade LEFT JOIN 
+						ufs AS U ON U.id = T.uf_cidade INNER JOIN 
+						forma_pagamento AS F ON N.forma_pagamento = F.id INNER JOIN 
+						convenios_debito_em_conta AS V ON F.cod_convenio = V.id
+					WHERE  
+						negocio_parcelas.numero_registro_e = 0 AND 
+						negocio_parcelas.vencimento <= '2023-01-30' AND 
+						V.cod_convenio = 5559234 AND 
+						negocio_parcelas.status = 1 AND
+						$condicao
+					GROUP BY 
+						negocio_parcelas.negocio_id,
+						negocio_parcelas.documento,
+						negocio_parcelas.vencimento,
+						negocio_parcelas.valor,
+						negocio_parcelas.data_pagamento,
+						negocio_parcelas.multa,
+						negocio_parcelas.juros,
+						negocio_parcelas.total,
+						negocio_parcelas.pagamento_parcelas,
+						negocio_parcelas.cod_retorno,
+						negocio_parcelas.cod_retorno1,
+						negocio_parcelas.cod_retorno2,
+						negocio_parcelas.cod_retorno3,
+						negocio_parcelas.cod_retorno4,
+						negocio_parcelas.cod_retorno5,
+						negocio_parcelas.num_sequencial_arquivo_debito,
+						negocio_parcelas.numero_registro_e,
+						negocio_parcelas.numero_agendamento_cliente,
+						negocio_parcelas.vencimento_original,
+						negocio_parcelas.valor_tarifa,
+						negocio_parcelas.status,
+						C.id,
+						C.endereco,
+						C.numero_endereco,
+						C.complemento_endereco,
+						C.bairro,
+						C.nome,
+						C.sobrenome,
+						C.cpf,
+						C.cep,
+						C.cidade,
+						T.nome_cidade,
+						U.nome_uf,
+						V.cod_convenio,
+						F.dias_antecedencia_cobranca_debito,
+						D.agencia_bancaria,
+						D.conta_corrente,
+						V.mensagem_cliente,
+						V.codigo_carteira,
+						N.vendedor_id";
 
 			$res3 = $connection->query($sql);
 			
@@ -137,11 +179,12 @@ if(isset($_GET['convenio']))
 			$sql = "INSERT INTO arquivos_debito_conta (nome_arquivo, tipo_arquivo, data_criacao, convenio, numero_registros, arquivo_optante, numero_arquivo)
 					VALUES('$nome_arquivo_debito_conta', 'REM', '$data_geracao_atual', $convenio, $contador_registros, 0, $numero_sequencial_arquivo)";
 			$res4 = $connection->query($sql);
-			
+		
 			// Busca o id com base no nome do aquivo, data criação e convenio 
 			$sql = "SELECT id FROM arquivos_debito_conta WHERE nome_arquivo = '$nome_arquivo_debito_conta' AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
 			$res5 = $connection->query($sql);
 			$row5 = $res5->fetch_object();
+
 
 			while($row2 = $res3->fetch_object())
 			{
@@ -161,7 +204,7 @@ if(isset($_GET['convenio']))
 					
 				}
 
-				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`num_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
+				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`num_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id and `numero_registro_e` <> 0;
 				$res6 = $connection->query($sql);
 
 				// Soma e Formata o valor da parcela
@@ -257,9 +300,8 @@ if(isset($_GET['convenio']))
 			}
 
 			// atualiza meu numero de registros na tabela arquivos debito conta
-			$sql = "UPDATE arquivos_debito_conta 
-					SET numero_registros = '$contador_registros' 
-					WHERE nome_arquivo = '$nome_arquivo_debito_conta' AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
+			$sql = "UPDATE arquivos_debito_conta SET numero_registros = '$contador_registros' WHERE nome_arquivo = '$nome_arquivo_debito_conta' 
+					AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
 			$res8 = $connection->query($sql);
 			
 			$Registro9 = array();

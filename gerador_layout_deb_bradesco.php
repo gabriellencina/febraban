@@ -14,6 +14,20 @@ $convenio   = $_GET['convenio'];
 $vencimento = date('Y-m-d', strtotime($_GET['data']));
 $vendedor 	= $_GET['vendedor'];
 
+function clearString($string="")
+{
+	$nova_string = $string;
+
+	if($string) {
+		$comAcentos = array('à', 'á', 'â', 'ã', 'ä', 'å', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ù', 'ü', 'ú', 'ÿ', 'À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'O', 'Ù', 'Ü', 'Ú');
+		$semAcentos = array('a', 'a', 'a', 'a', 'a', 'a', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'y', 'A', 'A', 'A', 'A', 'A', 'A', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U');
+		$nova_string = str_replace($comAcentos, $semAcentos, utf8_encode($string));
+	}
+
+	return $nova_string;
+        // Para usar
+}
+
 if(isset($_GET['convenio'])) 
 {
 	// Busca os dados do convenio
@@ -220,8 +234,8 @@ if(isset($_GET['convenio']))
 				$Registro1["valor_abatimento"]                      = 0;
 				$Registro1["id_tipo_inscricao_pagador"]             = 01;
 				$Registro1["num_inscricao_pagador"]                 = 00001 . $row2->cpf;
-				$Registro1["nome_pagador"]                          = trim($row2->nome) . ' ' . trim($row2->sobrenome);
-				$Registro1["endereco_completo"]                     = $row2->endereco . '-' . $row2->numero_endereco . '-' . $row2->complemento_endereco . '-' . $row2->bairro . '-' . $row2->nome_cidade . '-' . $row2->nome_uf;
+				$Registro1["nome_pagador"]                          = clearString(trim($row2->nome)) . ' ' . clearString(trim($row2->sobrenome));
+				$Registro1["endereco_completo"]                     = clearString($row2->endereco) . '-' . clearString($row2->numero_endereco) . '-' . clearString($row2->complemento_endereco) . '-' . clearString($row2->bairro) . '-' . clearString($row2->nome_cidade) . '-' . clearString($row2->nome_uf);
 				$Registro1["mensagem1"]                             = $row2->mensagem_cliente;
 				$Registro1["cep"]                                   = $converte_cep;
 				$Registro1["mensagem2"]                             = " ";
@@ -269,7 +283,7 @@ if(isset($_GET['convenio']))
 			// Gera arquivo de débito automático com os dados e logo após salva  
 			$nome_arquivo = "CB" . date('dm') . str_pad($numero_sequencial_arquivo, 2, '0', STR_PAD_LEFT) . ".REM";
 			$fp = fopen($_SERVER['DOCUMENT_ROOT'] . "/$nome_arquivo", "wb");
-			fwrite($fp, $content);
+			fwrite($fp, utf8_encode($content));
 			fclose($fp);
 
 			header("Location: index_bradesco.php");

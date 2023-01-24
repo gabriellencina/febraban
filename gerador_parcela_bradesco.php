@@ -18,13 +18,11 @@
     $convenio    = $_GET['convenio'];
 
     $arruma_data = explode('-', $data);
-
     
     $dia         = $dia_final;
     $mes         = $arruma_data[1];
     $ano         = $arruma_data[0];
-    
-    
+       
     if(isset($_GET['convenio'])) 
     {
         // Busca os dados do convenio

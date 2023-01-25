@@ -160,10 +160,14 @@
                             $formata_vencimento = date('dmy', strtotime($row2->vencimento));
                         
                         } else {
+
                             $data_vencimento = '99999999';
                             $soma_valores    = 0;
                             $inteiro         = 0;
                             $centavos        = '00';
+
+                            // $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ",`num_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
+                            // $res8 = $connection->query($sql);
                         }
 
                     $limpa_campo_conta_corrente =   [
@@ -209,14 +213,14 @@
 
                     $sql = "INSERT INTO arquivos_debito_conta_retornos (data_ocorrencia, arquivo_debito_conta_id, negocio_parcela_id, registro, agencia, conta, cliente_id, status)
                             VALUES('$data_geracao_atual', $row5->id, $row2->parcela, $contador_registros, $row2->agencia_bancaria, $row2->conta_corrente, $row2->id, $row2->status)";
-                    $res8 = $connection->query($sql);
+                    $res9 = $connection->query($sql);
                 }
 
                 // atualiza meu numero de registros na tabela arquivos debito conta
 			    $sql = "UPDATE arquivos_debito_conta 
                         SET numero_registros = '$contador_registros' 
                         WHERE nome_arquivo = '$nome_arquivo_debito_conta' AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
-                $res8 = $connection->query($sql);
+                $res10 = $connection->query($sql);
 
                 // Registro Z, confere a somatoria dos Registros E
                 $RegistroZ = array();

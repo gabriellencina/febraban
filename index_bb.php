@@ -60,7 +60,10 @@
                         <button class="btn btn-primary" type="submit" name="gera_arquivo_debito" value="2">Gerar arquivo debito</button>
                     </div>
                     <div class="row mb-3">
-                        <button class="btn btn-primary" type="submit" name="gera_arquivo_cancelamento" value="3">Gerar arquivo cancelamento</button>
+                        <button class="btn btn-primary" type="submit" name="gera_arquivo_optante" value="3">Gerar arquivo optante</button>
+                    </div>
+                    <div class="row mb-3">
+                        <button class="btn btn-primary" type="submit" name="gera_arquivo_cancelamento" value="4">Gerar arquivo cancelamento</button>
                     </div>
                 </form>
             </div>

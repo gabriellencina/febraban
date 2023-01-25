@@ -11,10 +11,12 @@ include('connection.php');
 
 // Recebendo por parâmetro de url o cod do convenio e data de vencimento
 $convenio   = $_GET['convenio'];
+
 $vencimento = date('Y-m-d', strtotime($_GET['data']));
+
 $vendedor 	= $_GET['vendedor'];
 
-function clearString($string="")
+function clearString($string = "")
 {
 	$nova_string = $string;
 
@@ -26,7 +28,6 @@ function clearString($string="")
 	}
 
 	return $nova_string;
-    // Para usar
 }
 
 if(isset($_GET['convenio'])) 
@@ -101,7 +102,7 @@ if(isset($_GET['convenio']))
 					negocio_parcelas.cod_retorno4,
 					negocio_parcelas.cod_retorno5,  
 					negocio_parcelas.numero_parcela,   
-					negocio_parcelas.num_sequencial_arquivo_debito,
+					negocio_parcelas.numero_sequencial_arquivo_debito,
 					negocio_parcelas.numero_registro_e,  
 					negocio_parcelas.numero_agendamento_cliente,
 					negocio_parcelas.vencimento_original,

@@ -64,6 +64,9 @@
                     <div class="row mb-3">
                         <button class="btn btn-primary" type="submit" name="gera_arquivo_cancelamento" value="3">Gerar arquivo cancelamento</button>
                     </div>
+                    <div class="row mb-3">
+                        <button class="btn btn-primary" type="submit" name="gera_arquivo_reagendamento" value="4">Gerar arquivo reagendamento</button>
+                    </div>
                 </form>
             </div>
         </div>

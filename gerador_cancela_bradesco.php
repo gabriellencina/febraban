@@ -6,7 +6,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-
 include("vendor/autoload.php");
 include('connection.php');
 
@@ -16,6 +15,20 @@ $convenio   = $_GET['convenio'];
 $vencimento = date('Y-m-d', strtotime($_GET['data']));
 
 $vendedor   = $_GET['vendedor'];
+
+function clearString($string = "")
+{
+	$nova_string = $string;
+
+	if($string) {
+		$comAcentos = array('à', 'á', 'â', 'ã', 'ä', 'å', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ù', 'ü', 'ú', 'ÿ', 'À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'O', 'Ù', 'Ü', 'Ú', 'Ãª', 'ª', 'º');
+		$semAcentos = array('a', 'a', 'a', 'a', 'a', 'a', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'y', 'A', 'A', 'A', 'A', 'A', 'A', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'E', 'a', 'o');
+		$nova_string = str_replace($comAcentos, $semAcentos, $string);
+		$nova_string = str_replace($comAcentos, $semAcentos, utf8_encode($nova_string));
+	}
+
+	return $nova_string;
+}
 
 if (isset($_GET['convenio'])) {
 	// Busca os dados do convenio
@@ -28,8 +41,10 @@ if (isset($_GET['convenio'])) {
 	$row = $res->fetch_object();
 
 	// Inicializa variáveis
+	$Registro0 					= array();
 	$Registro1                  = array();
 	$Registro6                  = array();
+	$Registro9 					= array();
 	$soma_valores               = 0;
 	$agencia                    = $row->agencia;
 	$conta                      = substr($row->conta_compromisso, 0, -1);
@@ -41,13 +56,10 @@ if (isset($_GET['convenio'])) {
 
 	switch ($cod_banco) {
 		case 237:
-
 			// Adiciona 1 ao numero sequencial do arquivo e guarda no convenio
 			$sql = "UPDATE `convenios_debito_em_conta` SET `numero_sequencial_arquivo` = $numero_sequencial_arquivo  WHERE `cod_convenio` = " . $convenio;
 			$res2 = $connection->query($sql);
 
-			// REGISTRO 0
-			$Registro0 = array();
 			$Registro0["cod_registro0"]                                 = 0;
 			$Registro0["cod_remessa"]                                   = 1;
 			$Registro0["literal_remessa"]                               = "REMESSA";
@@ -70,76 +82,82 @@ if (isset($_GET['convenio'])) {
 
 			$condicao = !empty($vendedor) ? "AND N.vendedor_id = $vendedor" :  " ";
 
-			// Busca as parcelas
-			$sql = "SELECT negocio_parcelas.id as parcela,
-                    negocio_parcelas.negocio_id,
-                    negocio_parcelas.documento, 
-                    negocio_parcelas.vencimento,   
-                    negocio_parcelas.valor,   
-                	negocio_parcelas.data_pagamento,  
-                    negocio_parcelas.multa,  
-                    negocio_parcelas.juros,
-                    negocio_parcelas.total, 
-                    negocio_parcelas.pagamento_parcelas,
-                    negocio_parcelas.cod_retorno,  
-                    negocio_parcelas.cod_retorno1,  
-                    negocio_parcelas.cod_retorno2,  
-                    negocio_parcelas.cod_retorno3,
-                    negocio_parcelas.cod_retorno4,
-                    negocio_parcelas.cod_retorno5,  
-                    negocio_parcelas.numero_parcela,   
-                    negocio_parcelas.num_sequencial_arquivo_debito,
-                    negocio_parcelas.numero_registro_e,  
-                    negocio_parcelas.numero_agendamento_cliente,
-                    negocio_parcelas.vencimento_original,
-                    negocio_parcelas.valor_tarifa,
-                    negocio_parcelas.status,
-                    C.id,
-                    C.endereco,
-                    C.numero_endereco,
-                    C.complemento_endereco,
-                    C.bairro,
-                	C.nome,
-                    C.sobrenome,
-                    C.cpf,
-                    C.cep,
-                    C.cidade,  
-                    T.nome_cidade,
-                    U.nome_uf,
-                    V.cod_convenio,
-                    F.dias_antecedencia_cobranca_debito,
-                    D.agencia_bancaria,
-                    D.conta_corrente,
-                    V.mensagem_cliente,
-                    V.codigo_carteira
-                    FROM negocio_parcelas
-                    INNER JOIN negocios as N ON N.id = negocio_id
-                    INNER JOIN clientes as C ON N.cliente_id = C.id
-                    INNER JOIN clientes_dados_debito as D ON N.conta_debito = D.id
-                    LEFT JOIN cidades as T ON T.id = C.cidade
-                    LEFT JOIN ufs as U ON U.id = T.uf_cidade
-                    INNER JOIN forma_pagamento as F ON N.forma_pagamento = F.id
-                    INNER JOIN convenios_debito_em_conta as V ON F.cod_convenio = V.id
-					WHERE negocio_parcelas.status = 0 AND negocio_parcelas.vencimento = '$vencimento' AND V.cod_convenio = $convenio $condicao";
-			 $res3 = $connection->query($sql);
+			// Busca as nossas parcelas
+			$sql = "SELECT	negocio_parcelas.id as parcela,
+						   	negocio_parcelas.negocio_id,
+							negocio_parcelas.documento, 
+							negocio_parcelas.vencimento,   
+							negocio_parcelas.valor,   
+							negocio_parcelas.data_pagamento,  
+							negocio_parcelas.multa,  
+							negocio_parcelas.juros,
+							negocio_parcelas.total, 
+							negocio_parcelas.pagamento_parcelas,
+							negocio_parcelas.cod_retorno,  
+							negocio_parcelas.cod_retorno1,  
+							negocio_parcelas.cod_retorno2,  
+							negocio_parcelas.cod_retorno3,
+							negocio_parcelas.cod_retorno4,
+							negocio_parcelas.cod_retorno5,  
+							negocio_parcelas.numero_parcela,   
+							negocio_parcelas.num_sequencial_arquivo_debito,
+							negocio_parcelas.numero_registro_e,  
+							negocio_parcelas.numero_agendamento_cliente,
+							negocio_parcelas.vencimento_original,
+							negocio_parcelas.valor_tarifa,
+							negocio_parcelas.status,
+							C.id,
+							C.endereco,
+							C.numero_endereco,
+							C.complemento_endereco,
+							C.bairro,
+							C.nome,
+							C.sobrenome,
+							C.cpf,
+							C.cep,
+							C.cidade,  
+							T.nome_cidade,
+							U.nome_uf,
+							V.cod_convenio,
+							F.dias_antecedencia_cobranca_debito,
+							D.agencia_bancaria,
+							D.conta_corrente,
+							V.mensagem_cliente,
+							V.codigo_carteira
+					FROM negocio_parcelas
+					INNER JOIN negocios as N ON N.id = negocio_id
+					INNER JOIN clientes as C ON N.cliente_id = C.id
+					INNER JOIN clientes_dados_debito as D ON N.conta_debito = D.id
+					LEFT JOIN cidades as T ON T.id = C.cidade
+					LEFT JOIN ufs as U ON U.id = T.uf_cidade
+					INNER JOIN forma_pagamento as F ON N.forma_pagamento = F.id
+					INNER JOIN convenios_debito_em_conta as V ON F.cod_convenio = V.id
+					WHERE negocio_parcelas.status = 1 AND negocio_parcelas.vencimento = '$vencimento' 
+													  AND V.cod_convenio = $convenio $condicao 
+													  AND negocio_parcelas.documento is not null";
+			$res3 = $connection->query($sql);
 
 			while ($row2 = $res3->fetch_object())
 			{
 				$converte_cep   = intval($row2->cep);
+
 				$reg_vencimento = str_replace('-', '', $row2->vencimento);
 
 				$reg_venci = str_replace('-', '', $vencimento);
 
 				// Verifica se a data de vencimento é menor que a data passada no parâmetro, se sim, atualiza o vencimento para o parametro passado
 				if ($reg_vencimento < $reg_venci) {
+
 					$data_vencimento = str_replace('-', '', $vencimento);
+
 				} else {
+
 					$data_vencimento = str_replace('-', '', $row2->vencimento);
+					
 				}
 
-				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`num_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
+				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e_cancelamento` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`numero_sequencial_arquivo_debito_cancelamento` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
 				$res4 = $connection->query($sql);
-
 
 				// Soma e Formata o valor da parcela
 				$soma_valores = $soma_valores + $row2->total;
@@ -159,8 +177,7 @@ if (isset($_GET['convenio'])) {
 													'V', 'v', 'W', 'w', 'X', 'x',
 													'Y', 'y', 'Z', 'z'
 												];
-
-				// Preenche Array do REGISTRO 1"                    
+                   
 				$Registro1["cod_registro1"]                         = 1;
 				$Registro1["agencia_debito"]                        = intval(str_replace(" ", "", $row2->agencia_bancaria));
 				$Registro1["razao_conta_corrente"]                  = 0;
@@ -200,8 +217,8 @@ if (isset($_GET['convenio'])) {
 				$Registro1["valor_abatimento"]                      = 0;
 				$Registro1["id_tipo_inscricao_pagador"]             = 01;
 				$Registro1["num_inscricao_pagador"]                 = 00001 . $row2->cpf;
-				$Registro1["nome_pagador"]                          = trim($row2->nome) . ' ' . trim($row2->sobrenome);
-				$Registro1["endereco_completo"]                     = $row2->endereco . '-' . $row2->numero_endereco . '-' . $row2->complemento_endereco . '-' . $row2->bairro . '-' . $row2->nome_cidade . '-' . $row2->nome_uf;
+				$Registro1["nome_pagador"]                          = clearString(trim($row2->nome)) . ' ' . clearString(trim($row2->sobrenome));
+				$Registro1["endereco_completo"]                     = clearString($row2->endereco) . '-' . clearString($row2->numero_endereco) . '-' . clearString($row2->complemento_endereco) . '-' . clearString($row2->bairro) . '-' . clearString($row2->nome_cidade) . '-' . clearString($row2->nome_uf);
 				$Registro1["mensagem1"]                             = $row2->mensagem_cliente;
 				$Registro1["cep"]                                   = $converte_cep;
 				$Registro1["mensagem2"]                             = " ";
@@ -212,8 +229,6 @@ if (isset($_GET['convenio'])) {
 				$content .= bradescoCancela400Layout::Registro1($Registro1) . PHP_EOL;
 			}
 
-			// REGISTRO 9
-			$Registro9 = array();
 			$Registro9["cod_registro9"]                = 9;
 			$Registro9["reservado_futuro_9"]       	   = " ";
 			$Registro9["numero_sequencial_registro3"]  = $contador_registros;

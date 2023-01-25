@@ -51,4 +51,11 @@ elseif(isset($_POST['gera_arquivo_debito']))
     header("Location: $url");
 }
 
+elseif(isset($_POST['gera_arquivo_reagendamento']))
+{
+    $gera_arquivo_debito = $_POST['gera_arquivo_reagendamento'];
+    $url = 'gerador_layout_reagendamento_bradesco.php?data=' . $data . '&convenio=' . $convenio . '&vendedor=' . $vendedor;
+    header("Location: $url");
+}
+
 

@@ -227,6 +227,24 @@ if (isset($_GET['convenio'])) {
 				$contador_registros += 1;
 
 				$content .= bradescoCancela400Layout::Registro1($Registro1) . PHP_EOL;
+
+				$Registro6["cod_registro6"]                         = 6;
+				$Registro6["carteira"]                              = $row->codigo_carteira;
+				$Registro6["agencia_debito"]                        = $agencia;
+				$Registro6["conta_corrente2"]                       = $conta;
+				$Registro6["numero_bradesco"]                       = 0;
+				$Registro6["digito_numero_bradesco"]                = 0;
+				$Registro6["tipo_operacao"]                         = 3;
+				$Registro6["utilizacao_cheque_especial"]            = "N";
+				$Registro6["consulta_saldo_apos_vencimento"]        = "N";
+				$Registro6["num_cod_id_contrato"]                   = $row2->negocio_id;
+				$Registro6["prazo_validade_contrato"]               = 999999999;
+				$Registro6["reservado_futuro_6"]                    = " ";
+				$Registro6["numero_sequencial_registro3"]           = $contador_registros;
+
+				$contador_registros += 1;
+
+				$content .= bradescoDebAuto400LayoutCNAB::Registro6($Registro6) . PHP_EOL;
 			}
 
 			$Registro9["cod_registro9"]                = 9;

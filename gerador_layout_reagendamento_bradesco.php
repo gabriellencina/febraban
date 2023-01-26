@@ -213,7 +213,7 @@ if (isset($_GET['convenio'])) {
                     $Registro1["id_rateio_credito"]                     = " ";
                     $Registro1["enderacamento_aviso_deb_auto"]          = 2;
                     $Registro1["quantidade_pagamentos"]                 = " ";
-                    $Registro1["id_ocorrencia"]                         = 6;
+                    $Registro1["id_ocorrencia"]                         = 31;
                     $Registro1["num_documento"]                         = " ";
                     $Registro1["data_vencimento_titulo"]                = $formata_vencimento;
                     $Registro1["valor_titulo"]                          = $inteiro . $centavos;
@@ -241,6 +241,24 @@ if (isset($_GET['convenio'])) {
                     $contador_registros += 1;
 
                     $content .= bradescoReagendamentoLayout::Registro1($Registro1) . PHP_EOL;
+
+					$Registro6["cod_registro6"]                         = 6;
+					$Registro6["carteira"]                              = $row->codigo_carteira;
+					$Registro6["agencia_debito"]                        = $agencia;
+					$Registro6["conta_corrente2"]                       = $conta;
+					$Registro6["numero_bradesco"]                       = 0;
+					$Registro6["digito_numero_bradesco"]                = 0;
+					$Registro6["tipo_operacao"]                         = 3;
+					$Registro6["utilizacao_cheque_especial"]            = "N";
+					$Registro6["consulta_saldo_apos_vencimento"]        = "N";
+					$Registro6["num_cod_id_contrato"]                   = $row2->negocio_id;
+					$Registro6["prazo_validade_contrato"]               = 999999999;
+					$Registro6["reservado_futuro_6"]                    = " ";
+					$Registro6["numero_sequencial_registro3"]           = $contador_registros;
+
+					$contador_registros += 1;
+
+					$content .= bradescoReagendamentoLayout::Registro6($Registro6) . PHP_EOL;
 			}
         }
 

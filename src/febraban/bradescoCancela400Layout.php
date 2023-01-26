@@ -115,7 +115,7 @@ class bradescoCancela400Layout{
         $campos['cod_banco_deb_camara_compensacao']         = array(63, 65, '9:3', $cod_banco_deb_camara_compensacao);
         $campos['campo_multa']                              = array(66, 66, '9:1', $campo_multa);
         $campos['percentual_multa']                         = array(67, 70, '9:4', $percentual_multa);
-        $campos['id_titulo_banco']                          = array(71, 82, '9:12', $id_titulo_banco);
+        $campos['id_titulo_banco']                          = array(71, 82, 'X:12', $id_titulo_banco);
         $campos['desconto_bonificacao_dia']                 = array(83, 92, '9:10', $desconto_bonificacao_dia);
         $campos['condicao_emissao_papeleta_cobranca']       = array(93, 93, '9:1', $condicao_emissao_papeleta_cobranca);
         $campos['ident_emite_boleto_deb_auto']              = array(94, 94, 'X:1', $ident_emite_boleto_deb_auto);

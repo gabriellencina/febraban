@@ -90,7 +90,7 @@ if (isset($_GET['convenio'])) {
 
 			// Busca as nossas parcelas
 			$sql = "SELECT	negocio_parcelas.id as parcela,
-						   	negocio_parcelas.negocio_id,
+							negocio_parcelas.negocio_id,
 							negocio_parcelas.documento, 
 							negocio_parcelas.vencimento,   
 							negocio_parcelas.valor,   
@@ -130,8 +130,8 @@ if (isset($_GET['convenio'])) {
 							D.conta_corrente,
 							V.mensagem_cliente,
 							V.codigo_carteira,
-                            N.dia_debito
-					FROM negocio_parcelas
+							N.dia_debito
+					FROM 	negocio_parcelas
 					INNER JOIN negocios as N ON N.id = negocio_id
 					INNER JOIN clientes as C ON N.cliente_id = C.id
 					INNER JOIN clientes_dados_debito as D ON N.conta_debito = D.id
@@ -140,16 +140,16 @@ if (isset($_GET['convenio'])) {
 					INNER JOIN forma_pagamento as F ON N.forma_pagamento = F.id
 					INNER JOIN convenios_debito_em_conta as V ON F.cod_convenio = V.id
 					WHERE negocio_parcelas.status = 1 
-                          AND negocio_parcelas.vencimento = '$vencimento' 
-						  AND V.cod_convenio = $convenio $condicao 
-						  AND negocio_parcelas.documento is not null";
+                    AND negocio_parcelas.vencimento = '$vencimento' 
+					AND V.cod_convenio = $convenio $condicao 
+					AND negocio_parcelas.documento is not null";
 			$res3 = $connection->query($sql);
             
 			while($row2 = $res3->fetch_object())
 			{  
                 $novo_dia = $row2->dia_debito;
 
-                $novo_vencimento = date('Y-m-d', strtotime($novo_dia . '-' . $novo_mês . '-' . $novo_ano));
+                $novo_vencimento = date('Y-m-d', strtotime($novo_dia . '-'. $novo_mês . '-' .$novo_ano));
                 
 				$converte_cep   = intval($row2->cep);
 
@@ -167,19 +167,18 @@ if (isset($_GET['convenio'])) {
 					$data_vencimento = str_replace('-', '', $row2->vencimento);
 					
 				}
-                
-                if($novo_vencimento > $dia_atual && strtotime($novo_vencimento) - strtotime($dia_atual) > 9)
-                {
-				    $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e_reagendamento` = " . $contador_registros . ", vencimento = " . $novo_vencimento . ",`numero_sequencial_arquivo_debito_reagendamento` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
+
+                if($novo_vencimento > $dia_atual && (strtotime($novo_vencimento) - strtotime($dia_atual) > 9))
+                {			
+				    $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e_reagendamento` = " . $contador_registros . ", vencimento = " . "'$novo_vencimento'" . ",`numero_sequencial_arquivo_debito_reagendamento` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
 				    $res4 = $connection->query($sql);
-                
 
                     // Soma e Formata o valor da parcela
                     $soma_valores = $soma_valores + $row2->total;
                     $inteiro      = intval($row2->total);
                     $centavos     = substr(number_format($row2->total, 2, ',', '.'), strpos(number_format($row2->total, 2, ',', '.'), ',', 0) + 1, strlen(number_format($row2->total, 2, ',', '.')));
 
-                    $formata_vencimento = date('dmy', strtotime($row2->vencimento));
+                    $formata_vencimento = date('dmy', strtotime($novo_vencimento));
 
                     $limpa_campo_conta_corrente =   [
                                                         'A', 'a', 'B', 'b', 'C', 'c',
@@ -192,7 +191,7 @@ if (isset($_GET['convenio'])) {
                                                         'V', 'v', 'W', 'w', 'X', 'x',
                                                         'Y', 'y', 'Z', 'z'
                                                     ];
-                    
+
                     $Registro1["cod_registro1"]                         = 1;
                     $Registro1["agencia_debito"]                        = intval(str_replace(" ", "", $row2->agencia_bancaria));
                     $Registro1["razao_conta_corrente"]                  = 0;
@@ -206,7 +205,7 @@ if (isset($_GET['convenio'])) {
                     $Registro1["cod_banco_deb_camara_compensacao"]      = 237;
                     $Registro1["campo_multa"]                           = 0;
                     $Registro1["percentual_multa"]                      = 0;
-                    $Registro1["id_titulo_banco"]                       = intval($row2->documento);
+                    $Registro1["id_titulo_banco"]                       = $row2->documento;
                     $Registro1["desconto_bonificacao_dia"]              = 0;
                     $Registro1["condicao_emissao_papeleta_cobranca"]    = 1;
                     $Registro1["ident_emite_boleto_deb_auto"]           = "N";
@@ -216,7 +215,7 @@ if (isset($_GET['convenio'])) {
                     $Registro1["quantidade_pagamentos"]                 = " ";
                     $Registro1["id_ocorrencia"]                         = 6;
                     $Registro1["num_documento"]                         = " ";
-                    $Registro1["data_vencimento_titulo"]                = $novo_vencimento;
+                    $Registro1["data_vencimento_titulo"]                = $formata_vencimento;
                     $Registro1["valor_titulo"]                          = $inteiro . $centavos;
                     $Registro1["banco_encarregado_cobranca"]            = 0;
                     $Registro1["agencia_depositaria"]                   = 0;

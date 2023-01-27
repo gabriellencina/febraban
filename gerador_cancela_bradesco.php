@@ -191,7 +191,7 @@ if (isset($_GET['convenio'])) {
 				$Registro1["cod_banco_deb_camara_compensacao"]      = 237;
 				$Registro1["campo_multa"]                           = 0;
 				$Registro1["percentual_multa"]                      = 0;
-				$Registro1["id_titulo_banco"]                       = intval($row2->documento);
+				$Registro1["id_titulo_banco"]                       = $row2->documento;
 				$Registro1["desconto_bonificacao_dia"]              = 0;
 				$Registro1["condicao_emissao_papeleta_cobranca"]    = 1;
 				$Registro1["ident_emite_boleto_deb_auto"]           = "N";
@@ -232,8 +232,7 @@ if (isset($_GET['convenio'])) {
 				$Registro6["carteira"]                              = $row->codigo_carteira;
 				$Registro6["agencia_debito"]                        = $agencia;
 				$Registro6["conta_corrente2"]                       = $conta;
-				$Registro6["numero_bradesco"]                       = 0;
-				$Registro6["digito_numero_bradesco"]                = 0;
+				$Registro6["numero_bradesco"]                       = $row2->documento;
 				$Registro6["tipo_operacao"]                         = 3;
 				$Registro6["utilizacao_cheque_especial"]            = "N";
 				$Registro6["consulta_saldo_apos_vencimento"]        = "N";

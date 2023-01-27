@@ -45,6 +45,7 @@ if(isset($_GET['convenio']))
 	$Registro0 					= array();
 	$Registro1                  = array();
 	$Registro6                  = array();
+	$Registro9 					= array();
 	$soma_valores               = 0;
 	$agencia                    = $row->agencia;
 	$conta                      = substr($row->conta_compromisso, 0, -1);
@@ -175,7 +176,7 @@ if(isset($_GET['convenio']))
 					
 				}
 
-				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`num_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id and `numero_registro_e` <> 0;
+				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`numero_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id and `numero_registro_e` <> 0;
 				$res6 = $connection->query($sql);
 
 				// Soma e Formata o valor da parcela
@@ -275,7 +276,6 @@ if(isset($_GET['convenio']))
 					AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
 			$res8 = $connection->query($sql);
 			
-			$Registro9 = array();
 			$Registro9["cod_registro9"]                = 9;
 			$Registro9["reservado_futuro_9"]           = " ";
 			$Registro9["numero_sequencial_registro3"]  = $contador_registros;

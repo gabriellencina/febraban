@@ -160,7 +160,6 @@ class bradescoReagendamentoLayout{
         $agencia_debito                                     = isset($cfg['agencia_debito']) ? $cfg['agencia_debito'] : ' ';
         $conta_corrente2                                    = isset($cfg['conta_corrente2']) ? $cfg['conta_corrente2'] : ' ';
         $numero_bradesco                                    = isset($cfg['numero_bradesco']) ? $cfg['numero_bradesco'] : ' ';
-        $digito_numero_bradesco                             = isset($cfg['digito_numero_bradesco']) ? $cfg['digito_numero_bradesco'] : ' ';
         $tipo_operacao                                      = isset($cfg['tipo_operacao']) ? $cfg['tipo_operacao'] : ' ';
         $utilizacao_cheque_especial                         = isset($cfg['utilizacao_cheque_especial']) ? $cfg['utilizacao_cheque_especial'] : ' ';
         $consulta_saldo_apos_vencimento                     = isset($cfg['consulta_saldo_apos_vencimento']) ? $cfg['consulta_saldo_apos_vencimento'] : ' ';
@@ -174,8 +173,7 @@ class bradescoReagendamentoLayout{
         $campos['carteira']                                 = array(2, 4, '9:3', $carteira);
         $campos['agencia_debito']                           = array(5, 9, '9:5', $agencia_debito);
         $campos['conta_corrente2']                          = array(10, 16, '9:7', $conta_corrente2);
-        $campos['numero_bradesco']                          = array(17, 27, '9:11', $numero_bradesco);
-        $campos['digito_numero_bradesco']                   = array(28, 28, '9:1', $digito_numero_bradesco);
+        $campos['numero_bradesco']                          = array(17, 28, 'X:12', $numero_bradesco);
         $campos['tipo_operacao']                            = array(29, 29, '9:1', $tipo_operacao);
         $campos['utilizacao_cheque_especial']               = array(30, 30, 'X:1', $utilizacao_cheque_especial);
         $campos['consulta_saldo_apos_vencimento']           = array(31, 31, 'X:1', $consulta_saldo_apos_vencimento);

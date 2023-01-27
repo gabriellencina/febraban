@@ -20,7 +20,7 @@ $novo_mês = substr($vencimento,5,2);
 
 $vendedor   = $_GET['vendedor'];
 
-$dia_atual = date('Y-m-d');
+$data_atual = date('Y-m-d');
 
 function clearString($string = "")
 {
@@ -142,15 +142,16 @@ if (isset($_GET['convenio'])) {
 					WHERE negocio_parcelas.status = 1 
                     AND negocio_parcelas.vencimento = '$vencimento' 
 					AND V.cod_convenio = $convenio $condicao 
-					AND negocio_parcelas.documento is not null";
+					AND negocio_parcelas.documento is not null 
+					AND N.dia_debito_alterado = 1";
 			$res3 = $connection->query($sql);
-            
+		
 			while($row2 = $res3->fetch_object())
-			{  
-                $novo_dia = $row2->dia_debito;
-
-                $novo_vencimento = date('Y-m-d', strtotime($novo_dia . '-'. $novo_mês . '-' .$novo_ano));
-                
+			{
+				$novo_dia = $row2->dia_debito;
+				
+				$novo_vencimento = date('Y-m-d', strtotime($novo_dia . '-'. $novo_mês . '-' .$novo_ano));
+				
 				$converte_cep   = intval($row2->cep);
 
 				$reg_vencimento = str_replace('-', '', $row2->vencimento);
@@ -166,12 +167,16 @@ if (isset($_GET['convenio'])) {
 
 					$data_vencimento = str_replace('-', '', $row2->vencimento);
 					
-				}
+				}	
+				
 
-                if($novo_vencimento > $dia_atual && (strtotime($novo_vencimento) - strtotime($dia_atual) > 9))
-                {			
+                if($novo_vencimento > $data_atual) 
+                {
 				    $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e_reagendamento` = " . $contador_registros . ", vencimento = " . "'$novo_vencimento'" . ",`numero_sequencial_arquivo_debito_reagendamento` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
 				    $res4 = $connection->query($sql);
+
+				    $sql  = "UPDATE `negocios` SET `dia_debito_alterado` = 0 WHERE `id` = $row2->negocio_id";
+				    $res5 = $connection->query($sql);
 
                     // Soma e Formata o valor da parcela
                     $soma_valores = $soma_valores + $row2->total;
@@ -246,8 +251,7 @@ if (isset($_GET['convenio'])) {
 					$Registro6["carteira"]                              = $row->codigo_carteira;
 					$Registro6["agencia_debito"]                        = $agencia;
 					$Registro6["conta_corrente2"]                       = $conta;
-					$Registro6["numero_bradesco"]                       = 0;
-					$Registro6["digito_numero_bradesco"]                = 0;
+					$Registro6["numero_bradesco"]                       = $row2->documento;
 					$Registro6["tipo_operacao"]                         = 3;
 					$Registro6["utilizacao_cheque_especial"]            = "N";
 					$Registro6["consulta_saldo_apos_vencimento"]        = "N";
@@ -274,7 +278,7 @@ if (isset($_GET['convenio'])) {
 			fwrite($fp, $content);
 			fclose($fp);
 
-			// header("Location: index_bradesco.php");
+			header("Location: index_bradesco.php");
 
 			break;
 

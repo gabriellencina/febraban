@@ -61,7 +61,7 @@
 				$RegistroA["nome_empresa"] 				 	= $row->nome_empresa;
 				$RegistroA["cod_banco"] 				 	= $cod_banco;
 				$RegistroA["nome_banco"] 				 	= $row->nome_banco; 
-				$RegistroA["data_movimento"] 			 	= Date('Ymd');
+				$RegistroA["data_movimento"] 			 	= date('Ymd');
 				$RegistroA["numero_sequencial_arquivo"]  	= $numero_sequencial_arquivo;
 				$RegistroA["versao_layout"] 			 	= $row->versao_layout;
 				$RegistroA["identificacao_servico"] 	 	= $row->identificacao_servico;
@@ -140,7 +140,7 @@
 						$RegistroE["valor_debito"]       			= $inteiro.$centavos;
 						$RegistroE["codigo_moeda"]       			= "03";
 						$RegistroE["uso_empresa"]        			= " ";
-						$RegistroE["numero_agendamento_cliente"] 	=  0;//intval($row->numero_agendamento_cliente);
+						$RegistroE["numero_agendamento_cliente"] 	=  0; //intval($row->numero_agendamento_cliente);
 						$RegistroE["reservado_futuroE"] 			= "";
 						$RegistroE["numero_sequencial_registro"] 	= $numero_sequencial_registroE;
 						$RegistroE["codigo_movimento"] 				= 5;

@@ -33,7 +33,7 @@ function clearString($string = "")
 if(isset($_GET['convenio'])) 
 {
 	// Busca os dados do convenio
-	$sql = "SELECT * , bancos.nome_banco, bancos.codigo_febraban, convenios_debito_em_conta.banco_id
+	$sql = "SELECT * , bancos.nome_banco, bancos.codigo_febraban, convenios_debito_em_conta.banco_id, convenios_debito_em_conta.id
             FROM convenios_debito_em_conta 
             INNER JOIN bancos
             ON bancos.id = convenios_debito_em_conta.banco_id	
@@ -266,8 +266,8 @@ if(isset($_GET['convenio']))
 
 				$content .= bradescoDebAuto400LayoutCNAB::Registro6($Registro6) . PHP_EOL;
 										
-				$sql = "INSERT INTO arquivos_debito_conta_retornos (data_ocorrencia, arquivo_debito_conta_id, negocio_parcela_id, registro, agencia, conta, cliente_id, status)
-						VALUES('$data_geracao_atual', $row5->id, $row2->parcela, $contador_registros, $row2->agencia_bancaria, $row2->conta_corrente, $row2->id, $row2->status)";
+				$sql = "INSERT INTO arquivos_debito_conta_retornos (data_ocorrencia, arquivo_debito_conta_id, negocio_parcela_id, registro, agencia, conta, cliente_id, status, cod_convenio, banco)
+						VALUES('$data_geracao_atual', $row5->id, $row2->parcela, $contador_registros, $row2->agencia_bancaria, $row2->conta_corrente, $row2->id, $row2->status, $row->id, $row->banco_id)";
 				$res7 = $connection->query($sql);
 			}
 

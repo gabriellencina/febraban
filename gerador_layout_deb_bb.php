@@ -34,13 +34,14 @@
     if(isset($_GET['convenio']))
     {
         // Busca os dados do convenio
-	    $sql = "SELECT * , bancos.nome_banco, bancos.codigo_febraban, convenios_debito_em_conta.banco_id
+	    $sql = "SELECT * , bancos.nome_banco, bancos.codigo_febraban, convenios_debito_em_conta.banco_id, convenios_debito_em_conta.id
                 FROM convenios_debito_em_conta 
                 INNER JOIN bancos
                 ON bancos.id = convenios_debito_em_conta.banco_id	
                 WHERE `cod_convenio` = " . $convenio;
         $res = $connection->query($sql);
         $row = $res->fetch_object();
+ 
 
         //Inicializa as variáveis
 		$cod_banco = $row->codigo_febraban;
@@ -94,7 +95,7 @@
                         negocio_parcelas.cod_retorno4,
                         negocio_parcelas.cod_retorno5,  
                         negocio_parcelas.numero_parcela,   
-                        negocio_parcelas.num_sequencial_arquivo_debito,
+                        negocio_parcelas.numero_sequencial_arquivo_debito,
                         negocio_parcelas.numero_registro_e,  
                         negocio_parcelas.numero_agendamento_cliente,
                         negocio_parcelas.vencimento_original,
@@ -149,7 +150,6 @@
                 $sql = "SELECT id FROM arquivos_debito_conta WHERE nome_arquivo = '$nome_arquivo_debito_conta' AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
                 $res6 = $connection->query($sql);
                 $row5 = $res6->fetch_object();
-            
          
                 while ($row2 = $res3->fetch_object())
                 {
@@ -180,8 +180,8 @@
                             $inteiro         = 0;
                             $centavos        = '00';
 
-                            // $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ",`num_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
-                            // $res8 = $connection->query($sql);
+                            $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ",`numero_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
+                            $res8 = $connection->query($sql);
                         }
 
                     $limpa_campo_conta_corrente =   [
@@ -225,8 +225,8 @@
 
                     $content .= bbDebAuto150Layout::RegistroE($RegistroE).PHP_EOL;
 
-                    $sql = "INSERT INTO arquivos_debito_conta_retornos (data_ocorrencia, arquivo_debito_conta_id, negocio_parcela_id, registro, agencia, conta, cliente_id, status)
-                            VALUES('$data_geracao_atual', $row5->id, $row2->parcela, $contador_registros, $row2->agencia_bancaria, $row2->conta_corrente, $row2->id, $row2->status)";
+                    $sql = "INSERT INTO arquivos_debito_conta_retornos (data_ocorrencia, arquivo_debito_conta_id, negocio_parcela_id, registro, agencia, conta, cliente_id, status, cod_convenio, banco)
+                            VALUES('$data_geracao_atual', $row5->id, $row2->parcela, $contador_registros, $row2->agencia_bancaria, $row2->conta_corrente, $row2->id, $row2->status, $row->id, $row->banco_id)";
                     $res9 = $connection->query($sql);
                 }
 

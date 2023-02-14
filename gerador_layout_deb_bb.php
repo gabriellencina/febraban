@@ -56,7 +56,6 @@
 				$sql = "UPDATE `convenios_debito_em_conta` SET `numero_sequencial_arquivo` = $numero_sequencial_arquivo  WHERE `cod_convenio` = ".$convenio;
 				$res = $connection->query($sql);
 
-                //REGISTRO A
                 $RegistroA = array();
                 $RegistroA["cod_registro"]                  = "A";
                 $RegistroA["cod_remessa"]                   = 1;
@@ -74,11 +73,10 @@
                 
                 $content .= bbDebAuto150Layout::RegistroA($RegistroA).PHP_EOL;
 
-                $condicao = !empty($vendedor) ? "AND N.vendedor_id = $vendedor" :  " ";
+                $condicao  = !empty($vendedor) ? "AND N.vendedor_id = $vendedor" :  " ";
 
                 $condicao2 = !empty($optante) ? "AND N.optin_pendente = 1" : " ";
 
-                //REGISTRO E
                 // Busca as parcelas
                 $sql = "SELECT negocio_parcelas.id as parcela,
                         negocio_parcelas.negocio_id,
@@ -121,7 +119,8 @@
                         D.conta_corrente,
                         V.mensagem_cliente,
                         V.codigo_carteira,
-                        N.vendedor_id
+                        N.vendedor_id,
+                        N.optin_pendente
                         FROM negocio_parcelas
                         INNER JOIN negocios as N ON N.id = negocio_id
                         INNER JOIN clientes as C ON N.cliente_id = C.id
@@ -135,7 +134,7 @@
                                                                      AND negocio_parcelas.status = 1
                                                                      $condicao $condição2";
 			    $res3 = $connection->query($sql);
-               
+                         
                 
                 $nome_arquivo_debito_conta = "DEB_".$cod_banco."_".$convenio."_".date('ymd')."_".str_pad($numero_sequencial_arquivo, 5 , '0' , STR_PAD_LEFT).".REM";
                 
@@ -154,8 +153,8 @@
                 $row5 = $res6->fetch_object();
          
                 while($row2 = $res3->fetch_object())
-                {
-                    if($optante == 0)
+                {     
+                    if($row2->optin_pendente == 0)
                     {
                         // Verifica se a data de vencimento é menor que a data passada no parâmetro, se sim, atualiza o vencimento para o parametro passado
                         if (str_replace('-', '', $row2->vencimento) < str_replace('-', '', $vencimento))
@@ -198,8 +197,7 @@
                                                         'Y', 'y', 'Z', 'z'
                                                     ];
 
-                    // Preenche array do Registro E
-                    $RegistroE = array();
+                    $RegistroE                                  = array();
                     $RegistroE["cod_registro_e"]                = "E";
                     $RegistroE["id_cliente_destinataria"]       = 0 . $row2->cpf;
                     $RegistroE["agencia_debito"]                = $row2->agencia_bancaria;
@@ -216,7 +214,7 @@
                     $RegistroE["opcao_debito_parcial"]          = 2;
                     $RegistroE["reservado_futuro_E"]            = " ";
 
-                    if($optante == 0) 
+                    if($row2->optin_pendente == 0) 
                     {
                         $RegistroE["cod_movimento"]        =  0;
                     } else {
@@ -238,8 +236,7 @@
                         WHERE nome_arquivo = '$nome_arquivo_debito_conta' AND data_criacao = '$data_geracao_atual' AND convenio = '$convenio'";
                 $res10 = $connection->query($sql);
 
-                // Registro Z, confere a somatoria dos Registros E
-                $RegistroZ = array();
+                $RegistroZ                                      = array();
                 $inteiro 										= intval($soma_valores);
                 $centavos 										= substr(number_format($soma_valores, 2, ',', '.'), strpos(number_format($soma_valores, 2, ',', '.'),',',0)+1, strlen(number_format($soma_valores, 2, ',', '.')));
                 $RegistroZ["cod_registro_z"]                    = "Z";

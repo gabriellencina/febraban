@@ -76,6 +76,8 @@
 
                 $condicao = !empty($vendedor) ? "AND N.vendedor_id = $vendedor" :  " ";
 
+                $condicao2 = !empty($optante) ? "AND N.optin_pendente = 1" : " ";
+
                 //REGISTRO E
                 // Busca as parcelas
                 $sql = "SELECT negocio_parcelas.id as parcela,
@@ -131,7 +133,7 @@
                         WHERE negocio_parcelas.numero_registro_e = 0 AND negocio_parcelas.vencimento <= '$vencimento' 
                                                                      AND V.cod_convenio = $convenio 
                                                                      AND negocio_parcelas.status = 1
-                                                                     $condicao";
+                                                                     $condicao $condição2";
 			    $res3 = $connection->query($sql);
                
                 
@@ -151,7 +153,7 @@
                 $res6 = $connection->query($sql);
                 $row5 = $res6->fetch_object();
          
-                while ($row2 = $res3->fetch_object())
+                while($row2 = $res3->fetch_object())
                 {
                     if($optante == 0)
                     {
@@ -163,7 +165,7 @@
                             $data_vencimento = str_replace('-', '', $row2->vencimento);
                         }
             
-                            $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`num_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
+                            $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`numero_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
                             $res7 = $connection->query($sql);
                         
                             // Soma e Formata o valor da parcela
@@ -199,7 +201,7 @@
                     // Preenche array do Registro E
                     $RegistroE = array();
                     $RegistroE["cod_registro_e"]                = "E";
-                    $RegistroE["id_cliente_destinataria"]       = $row2->cpf;
+                    $RegistroE["id_cliente_destinataria"]       = 0 . $row2->cpf;
                     $RegistroE["agencia_debito"]                = $row2->agencia_bancaria;
                     $RegistroE["id_cliente_depositaria"]        = intval(str_replace($limpa_campo_conta_corrente, 0, $row2->conta_corrente));
                     $RegistroE["prazo_validade_contrato"]       = $data_vencimento;

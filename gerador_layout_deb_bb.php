@@ -30,18 +30,17 @@
 
 	    return $nova_string;
     }
-
+    
     if(isset($_GET['convenio']))
     {
         // Busca os dados do convenio
-	    $sql = "SELECT * , bancos.nome_banco, bancos.codigo_febraban, convenios_debito_em_conta.banco_id, convenios_debito_em_conta.id
+        $sql = "SELECT * , bancos.nome_banco, bancos.codigo_febraban, convenios_debito_em_conta.banco_id, convenios_debito_em_conta.id
                 FROM convenios_debito_em_conta 
                 INNER JOIN bancos
                 ON bancos.id = convenios_debito_em_conta.banco_id	
                 WHERE `cod_convenio` = " . $convenio;
         $res = $connection->query($sql);
         $row = $res->fetch_object();
- 
 
         //Inicializa as variáveis
 		$cod_banco = $row->codigo_febraban;
@@ -129,10 +128,13 @@
                         LEFT JOIN ufs as U ON U.id = T.uf_cidade
                         INNER JOIN forma_pagamento as F ON N.forma_pagamento = F.id
                         INNER JOIN convenios_debito_em_conta as V ON F.cod_convenio = V.id
-                        WHERE negocio_parcelas.numero_registro_e = 0 AND negocio_parcelas.vencimento <= '$vencimento' 
-                                                                     AND V.cod_convenio = $convenio 
+                        WHERE negocio_parcelas.numero_registro_e = 0 AND V.cod_convenio = $convenio 
                                                                      AND negocio_parcelas.status = 1
-                                                                     $condicao $condição2";
+                                                                     AND (negocio_parcelas.vencimento <= '$vencimento' OR N.optin_pendente = 0) 
+                                                                     $condicao ";
+                        echo $sql;
+                        die;
+
 			    $res3 = $connection->query($sql);
                          
                 
@@ -175,9 +177,8 @@
                             $formata_vencimento = date('dmy', strtotime($row2->vencimento));
                         
                         } else {
-
+                            
                             $data_vencimento = '99999999';
-                            $soma_valores    = 0;
                             $inteiro         = 0;
                             $centavos        = '00';
 
@@ -240,7 +241,7 @@
                 $inteiro 										= intval($soma_valores);
                 $centavos 										= substr(number_format($soma_valores, 2, ',', '.'), strpos(number_format($soma_valores, 2, ',', '.'),',',0)+1, strlen(number_format($soma_valores, 2, ',', '.')));
                 $RegistroZ["cod_registro_z"]                    = "Z";
-                $RegistroZ["total_registros_arquivo"]           =  $contador_registros;
+                $RegistroZ["total_registros_arquivo"]           = $contador_registros;
                 $RegistroZ["valor_total_registros_arquivo"]     = $inteiro.$centavos;
                 $RegistroZ["reservado_futuro_Z"]                = " ";
 

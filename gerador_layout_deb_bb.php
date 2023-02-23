@@ -132,8 +132,6 @@
                                                                      AND negocio_parcelas.status = 1
                                                                      AND (negocio_parcelas.vencimento <= '$vencimento' OR N.optin_pendente = 0) 
                                                                      $condicao ";
-                        echo $sql;
-                        die;
 
 			    $res3 = $connection->query($sql);
                          

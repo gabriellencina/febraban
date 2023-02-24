@@ -256,7 +256,7 @@ if(isset($_GET['convenio']))
 				$Registro6["digito_numero_bradesco"]                = 0;
 				$Registro6["tipo_operacao"]                         = 3;
 				$Registro6["utilizacao_cheque_especial"]            = "N";
-				$Registro6["consulta_saldo_apos_vencimento"]        = "N";
+				$Registro6["consulta_saldo_apos_vencimento"]        = "S";
 				$Registro6["num_cod_id_contrato"]                   = $row2->negocio_id;
 				$Registro6["prazo_validade_contrato"]               = 999999999;
 				$Registro6["reservado_futuro_6"]                    = " ";

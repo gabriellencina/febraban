@@ -169,10 +169,10 @@ if (isset($_GET['convenio'])) {
 					
 				}	
 				
-
+				// TESTAR ESSE NOVO CÓDIGO E SUBIR PRO SERVIDOR
                 if($novo_vencimento > $data_atual) 
                 {
-				    $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e_reagendamento` = " . $contador_registros . ", vencimento = " . "'$novo_vencimento'" . ",`numero_sequencial_arquivo_debito_reagendamento` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id;
+				    $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e_reagendamento` = " . $contador_registros . ", vencimento = " . "'$novo_vencimento'" . ",`numero_sequencial_arquivo_debito_reagendamento` = " . $numero_sequencial_arquivo . " WHERE `id` = " . $row2->parcela;
 				    $res4 = $connection->query($sql);
 
 				    $sql  = "UPDATE `negocios` SET `dia_debito_alterado` = 0 WHERE `id` = $row2->negocio_id";

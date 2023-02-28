@@ -86,48 +86,48 @@ if(isset($_GET['convenio']))
 			$condicao = !empty($vendedor) ? "AND N.vendedor_id = $vendedor" :  " ";
 
 			// Busca as parcelas
-			$sql = "SELECT negocio_parcelas.id as parcela,
-					negocio_parcelas.negocio_id,
-					negocio_parcelas.documento, 
-					negocio_parcelas.vencimento,   
-					negocio_parcelas.valor,   
-					negocio_parcelas.data_pagamento,  
-					negocio_parcelas.multa,  
-					negocio_parcelas.juros,
-					negocio_parcelas.total, 
-					negocio_parcelas.pagamento_parcelas,
-					negocio_parcelas.cod_retorno,  
-					negocio_parcelas.cod_retorno1,  
-					negocio_parcelas.cod_retorno2,  
-					negocio_parcelas.cod_retorno3,
-					negocio_parcelas.cod_retorno4,
-					negocio_parcelas.cod_retorno5,  
-					negocio_parcelas.numero_parcela,   
-					negocio_parcelas.numero_sequencial_arquivo_debito,
-					negocio_parcelas.numero_registro_e,  
-					negocio_parcelas.numero_agendamento_cliente,
-					negocio_parcelas.vencimento_original,
-					negocio_parcelas.valor_tarifa,
-					negocio_parcelas.status,
-					C.id,
-					C.endereco,
-					C.numero_endereco,
-					C.complemento_endereco,
-					C.bairro,
-					C.nome,
-					C.sobrenome,
-					C.cpf,
-					C.cep,
-					C.cidade,  
-					T.nome_cidade,
-					U.nome_uf,
-					V.cod_convenio,
-					F.dias_antecedencia_cobranca_debito,
-					D.agencia_bancaria,
-					D.conta_corrente,
-					V.mensagem_cliente,
-					V.codigo_carteira,
-					N.vendedor_id
+			$sql = "SELECT	negocio_parcelas.id as parcela,
+							negocio_parcelas.negocio_id,
+							negocio_parcelas.documento, 
+							negocio_parcelas.vencimento,   
+							negocio_parcelas.valor,   
+							negocio_parcelas.data_pagamento,  
+							negocio_parcelas.multa,  
+							negocio_parcelas.juros,
+							negocio_parcelas.total, 
+							negocio_parcelas.pagamento_parcelas,
+							negocio_parcelas.cod_retorno,  
+							negocio_parcelas.cod_retorno1,  
+							negocio_parcelas.cod_retorno2,  
+							negocio_parcelas.cod_retorno3,
+							negocio_parcelas.cod_retorno4,
+							negocio_parcelas.cod_retorno5,  
+							negocio_parcelas.numero_parcela,   
+							negocio_parcelas.numero_sequencial_arquivo_debito,
+							negocio_parcelas.numero_registro_e,  
+							negocio_parcelas.numero_agendamento_cliente,
+							negocio_parcelas.vencimento_original,
+							negocio_parcelas.valor_tarifa,
+							negocio_parcelas.status,
+							C.id,
+							C.endereco,
+							C.numero_endereco,
+							C.complemento_endereco,
+							C.bairro,
+							C.nome,
+							C.sobrenome,
+							C.cpf,
+							C.cep,
+							C.cidade,  
+							T.nome_cidade,
+							U.nome_uf,
+							V.cod_convenio,
+							F.dias_antecedencia_cobranca_debito,
+							D.agencia_bancaria,
+							D.conta_corrente,
+							V.mensagem_cliente,
+							V.codigo_carteira,
+							N.vendedor_id
 					FROM negocio_parcelas
 					INNER JOIN negocios as N ON N.id = negocio_id
 					INNER JOIN clientes as C ON N.cliente_id = C.id
@@ -157,7 +157,6 @@ if(isset($_GET['convenio']))
 			$res5 = $connection->query($sql);
 			$row5 = $res5->fetch_object();
 
-
 			while($row2 = $res3->fetch_object())
 			{
 				// $converte_cep   = intval($row2->cep);
@@ -176,7 +175,7 @@ if(isset($_GET['convenio']))
 					
 				}
 
-				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ", vencimento = " . $data_vencimento . ",`numero_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `negocio_id` = " . $row2->negocio_id and `numero_registro_e` <> 0;
+				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ",`numero_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `id` = " . $row2->parcela AND `numero_registro_e` <> 0;
 				$res6 = $connection->query($sql);
 
 				// Soma e Formata o valor da parcela
@@ -269,6 +268,7 @@ if(isset($_GET['convenio']))
 				$sql = "INSERT INTO arquivos_debito_conta_retornos (data_ocorrencia, arquivo_debito_conta_id, negocio_parcela_id, registro, agencia, conta, cliente_id, status, cod_convenio, banco)
 						VALUES('$data_geracao_atual', $row5->id, $row2->parcela, $contador_registros, $row2->agencia_bancaria, $row2->conta_corrente, $row2->id, $row2->status, $row->id, $row->banco_id)";
 				$res7 = $connection->query($sql);
+				
 			}
 
 			// atualiza meu numero de registros na tabela arquivos debito conta

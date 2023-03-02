@@ -175,7 +175,7 @@ if(isset($_GET['convenio']))
 					
 				}
 
-				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ",`numero_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `id` = " . $row2->parcela AND `numero_registro_e` <> 0;
+				$sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ",`numero_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `id` = " . $row2->parcela;
 				$res6 = $connection->query($sql);
 
 				// Soma e Formata o valor da parcela

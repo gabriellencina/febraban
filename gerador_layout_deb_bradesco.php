@@ -266,7 +266,7 @@ if(isset($_GET['convenio']))
 				$content .= bradescoDebAuto400LayoutCNAB::Registro6($Registro6) . PHP_EOL;
 										
 				$sql = "INSERT INTO arquivos_debito_conta_retornos (data_ocorrencia, arquivo_debito_conta_id, negocio_parcela_id, registro, agencia, conta, cliente_id, status, cod_convenio, banco)
-						VALUES('$data_geracao_atual', $row5->id, $row2->parcela, $contador_registros, $row2->agencia_bancaria, $row2->conta_corrente, $row2->id, $row2->status, $row->id, $row->banco_id)";
+						VALUES('$data_geracao_atual', $row5->id, $row2->parcela, $contador_registros, '$row2->agencia_bancaria', '$row2->conta_corrente', $row2->id, $row2->status, $row->id, $row->banco_id)";
 				$res7 = $connection->query($sql);
 				
 			}

@@ -12,7 +12,7 @@ class bbDebAuto150Layout{
 
     public static function RegistroA($cfg)
     {
-
+            
         $cod_registro                           = isset($cfg['cod_registro']) ? $cfg['cod_registro'] :' ';
         $cod_remessa                            = isset($cfg['cod_remessa']) ? $cfg['cod_remessa'] : 0;
         $cod_convenio 						    = isset($cfg['cod_convenio']) ? $cfg['cod_convenio'] :' ';

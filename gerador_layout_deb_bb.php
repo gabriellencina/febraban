@@ -135,7 +135,6 @@
 
 			    $res3 = $connection->query($sql);
                          
-                
                 $nome_arquivo_debito_conta = "DEB_".$cod_banco."_".$convenio."_".date('ymd')."_".str_pad($numero_sequencial_arquivo, 5 , '0' , STR_PAD_LEFT).".REM";
                 
                 $data_geracao_atual = date('Y-m-d');
@@ -157,7 +156,7 @@
                     if($row2->optin_pendente == 0)
                     {
                         // Verifica se a data de vencimento é menor que a data passada no parâmetro, se sim, atualiza o vencimento para o parametro passado
-                        if (str_replace('-', '', $row2->vencimento) < str_replace('-', '', $vencimento))
+                        if(str_replace('-', '', $row2->vencimento) < str_replace('-', '', $vencimento))
                         {
                             $data_vencimento = str_replace('-', '', $vencimento);
                         } else {
@@ -167,7 +166,7 @@
                             $sql  = "UPDATE `negocio_parcelas` SET `numero_registro_e` = " . $contador_registros . ",`numero_sequencial_arquivo_debito` = " . $numero_sequencial_arquivo . " WHERE `id` = " . $row2->parcela AND `numero_registro_e` <> 0;
                             $res7 = $connection->query($sql);
                         
-                            // Soma e Formata o valor da parcela
+                            // Soma e formata o valor da parcela
                             $soma_valores = $soma_valores + $row2->total;
                             $inteiro      = intval($row2->total);
                             $centavos     = substr(number_format($row2->total, 2, ',', '.'), strpos(number_format($row2->total, 2, ',', '.'), ',', 0) + 1, strlen(number_format($row2->total, 2, ',', '.')));
@@ -227,6 +226,8 @@
                     $sql = "INSERT INTO arquivos_debito_conta_retornos (data_ocorrencia, arquivo_debito_conta_id, negocio_parcela_id, registro, agencia, conta, cliente_id, status, cod_convenio, banco)
                             VALUES('$data_geracao_atual', $row5->id, $row2->parcela, $contador_registros, $row2->agencia_bancaria, $row2->conta_corrente, $row2->id, $row2->status, $row->id, $row->banco_id)";
                     $res9 = $connection->query($sql);
+                    echo $sql;
+                    exit();
                 }
 
                 // atualiza meu numero de registros na tabela arquivos debito conta
